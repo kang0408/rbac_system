@@ -11,6 +11,7 @@
 const PREFIX = "/api/v1";
 const USER_PREFIX = "/users";
 const ROLE_PREFIX = "/roles";
+const PERMISSION_PREFIX = "/permissions";
 
 const routes = [
   // USER
@@ -64,6 +65,32 @@ const routes = [
     method: "DELETE",
     path: PREFIX + ROLE_PREFIX + "/delete/:id",
     action: "role/delete-role",
+  },
+  // ROLE
+  {
+    method: "GET",
+    path: PREFIX + PERMISSION_PREFIX,
+    action: "permission/get-all",
+  },
+  {
+    method: "GET",
+    path: PREFIX + PERMISSION_PREFIX + "/:id",
+    action: "permission/get-details",
+  },
+  {
+    method: "PATCH",
+    path: PREFIX + PERMISSION_PREFIX + "/update/:id",
+    action: "permission/update-permission",
+  },
+  {
+    method: "POST",
+    path: PREFIX + PERMISSION_PREFIX + "/create",
+    action: "permission/create-permission",
+  },
+  {
+    method: "DELETE",
+    path: PREFIX + PERMISSION_PREFIX + "/delete/:id",
+    action: "permission/delete-permission",
   },
 ];
 
