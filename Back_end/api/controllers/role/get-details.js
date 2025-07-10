@@ -37,7 +37,12 @@ module.exports = {
       const permisstionFormat = {};
       permissionDetails.forEach((item) => {
         if (!permisstionFormat[item.resource])
-          permisstionFormat[item.resource] = [];
+          permisstionFormat[item.resource] = [
+            {
+              id: item.id,
+              action: item.action,
+            },
+          ];
         else {
           permisstionFormat[item.resource].push({
             id: item.id,
