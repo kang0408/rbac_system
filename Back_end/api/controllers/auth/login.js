@@ -49,6 +49,14 @@ module.exports = {
           message: "Password is not correct",
         });
 
+      const role = await Role.findOne({ id: existed.roles[0] });
+
+      existed.roles = [];
+      existed.roles.push({
+        id: role.id,
+        name: role.name,
+      });
+
       const accessToken = jwt.sign(
         {
           username: existed.username,
