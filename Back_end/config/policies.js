@@ -13,7 +13,7 @@ const permission = require("../api/policies/permission");
 
 module.exports.policies = {
   // AUTH
-  "auth/me": [isLoggin, permission],
+  "auth/me": [isLoggin],
   // USER
   "user/*": [isLoggin, permission],
   // ROLE

@@ -31,6 +31,14 @@ module.exports = {
 
       delete details.password;
 
+      const role = await Role.findOne({ id: details.roles[0] });
+
+      details.roles = [];
+      details.roles.push({
+        id: role.id,
+        name: role.name,
+      });
+
       return exits.success({
         status: 200,
         message: "Get details of user successfully",

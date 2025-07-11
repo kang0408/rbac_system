@@ -65,6 +65,33 @@ module.exports = {
         .project({ password: 0 })
         .toArray();
 
+      const allRoleIds = [
+        ...new Set(users.flatMap((user) => user.roles || [])),
+      ];
+
+      const roles = await Role.find({
+        id: { in: allRoleIds },
+      });
+
+      const roleMap = {};
+      roles.forEach((role) => {
+        roleMap[role.id] = {
+          id: role.id,
+          name: role.name,
+        };
+      });
+
+      const usersWithRoles = users.map((user) => {
+        const populatedRoles = (user.roles || []).map(
+          (roleId) =>
+            roleMap[typeof roleId === "string" ? roleId : roleId.toString()]
+        );
+        return {
+          ...user,
+          roles: populatedRoles,
+        };
+      });
+
       const total = await mongoClient
         .db("rbac_system")
         .collection("users")
@@ -76,7 +103,7 @@ module.exports = {
         status: 200,
         message: "Get all users successfully",
         data: {
-          users: users,
+          users: usersWithRoles,
           total: total.length,
           page,
           limit,
