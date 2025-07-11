@@ -176,6 +176,10 @@ const routes = [
     method: "GET",
     path: PREFIX + STATISTICS_PREFIX,
     action: "statistics/total",
+    options: {
+      resource: "statistics",
+      action: "read",
+    },
   },
 ];
 

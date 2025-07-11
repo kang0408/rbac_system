@@ -21,5 +21,5 @@ module.exports.policies = {
   // PERMISSION
   "permission/*": [isLoggin, permission],
   // STATISTICS
-  "statistics/*": [isLoggin],
+  "statistics/*": [isLoggin, permission],
 };
