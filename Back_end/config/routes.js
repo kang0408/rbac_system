@@ -15,6 +15,7 @@ const USER_PREFIX = "/users";
 const ROLE_PREFIX = "/roles";
 const PERMISSION_PREFIX = "/permissions";
 const AUTH_PREFIX = "/auth";
+const STATISTICS_PREFIX = "/statistics";
 
 const routes = [
   // USER
@@ -170,6 +171,12 @@ const routes = [
       action: "read",
     },
   },
+  // STATISTICS
+  {
+    method: "GET",
+    path: PREFIX + STATISTICS_PREFIX,
+    action: "statistics/total",
+  },
 ];
 
 const routesObj = {};
@@ -180,7 +187,5 @@ routes.forEach((item) => {
     ...(item.options && { options: item.options }),
   };
 });
-
-console.log(routesObj);
 
 module.exports.routes = routesObj;

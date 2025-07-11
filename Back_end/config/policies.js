@@ -20,4 +20,6 @@ module.exports.policies = {
   "role/*": [isLoggin, permission],
   // PERMISSION
   "permission/*": [isLoggin, permission],
+  // STATISTICS
+  "statistics/*": [isLoggin],
 };
