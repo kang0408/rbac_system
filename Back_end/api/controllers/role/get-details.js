@@ -30,34 +30,31 @@ module.exports = {
       if (!details)
         return exits.notFound({ status: 404, message: "Role not found" });
 
-      const permissionDetails = await Permission.find({
-        id: { in: details.permissions },
-      });
+      // const permissionDetails = await Permission.find({
+      //   id: { in: details.permissions },
+      // });
 
-      const permisstionFormat = {};
-      permissionDetails.forEach((item) => {
-        if (!permisstionFormat[item.resource])
-          permisstionFormat[item.resource] = [
-            {
-              id: item.id,
-              action: item.action,
-            },
-          ];
-        else {
-          permisstionFormat[item.resource].push({
-            id: item.id,
-            action: item.action,
-          });
-        }
-      });
+      // const permisstionFormat = {};
+      // permissionDetails.forEach((item) => {
+      //   if (!permisstionFormat[item.resource])
+      //     permisstionFormat[item.resource] = [
+      //       {
+      //         id: item.id,
+      //         action: item.action,
+      //       },
+      //     ];
+      //   else {
+      //     permisstionFormat[item.resource].push({
+      //       id: item.id,
+      //       action: item.action,
+      //     });
+      //   }
+      // });
 
       return exits.success({
         status: 200,
         message: "Get details of role successfully",
-        data: {
-          ...details,
-          permissions: permisstionFormat,
-        },
+        data: details,
       });
     } catch (error) {
       sails.log.error("Server Error: ", error);
