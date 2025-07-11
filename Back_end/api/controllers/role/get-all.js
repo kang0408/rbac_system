@@ -3,33 +3,7 @@ module.exports = {
 
   description: "",
 
-  inputs: {
-    page: {
-      type: "number",
-      description: "The current page",
-      defaultsTo: 1,
-    },
-    limit: {
-      type: "number",
-      description: "Quantity of item in a page",
-      defaultsTo: 5,
-    },
-    search: {
-      type: "string",
-      description: "Search string query",
-    },
-    sortBy: {
-      type: "string",
-      description: "Sort by something, default is sorting by updated time",
-      defaultsTo: "updatedAt",
-    },
-    sortValue: {
-      type: "string",
-      description: "Sort decreasing or increasing",
-      isIn: ["ASC", "DESC"],
-      defaultsTo: "DESC",
-    },
-  },
+  inputs: {},
 
   exits: {
     serverError: {
@@ -40,48 +14,17 @@ module.exports = {
 
   fn: async function (inputs, exits) {
     try {
-      const { page, limit, search, sortBy, sortValue } = inputs;
+      const roles = await Role.find();
 
-      const whereOptions = {};
-
-      if (search) {
-        whereOptions.email = {
-          $regex: search,
-          $options: "i",
-        };
-      }
-
-      const mongoClient = Role.getDatastore().manager.client;
-
-      const roles = await mongoClient
-        .db("rbac_system")
-        .collection("roles")
-        .find(whereOptions)
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .sort({
-          [sortBy]: sortValue,
-        })
-        .project({ password: 0, permissions: 0 })
-        .toArray();
-
-      const total = await mongoClient
-        .db("rbac_system")
-        .collection("roles")
-        .find(whereOptions)
-        .toArray();
-      const pageTotal = Math.ceil(total.length / limit);
+      const formatedRoles = roles.map((item) => {
+        delete item.permissions;
+        return item;
+      });
 
       return exits.success({
         status: 200,
         message: "Get all roles successfully",
-        data: {
-          roles: roles,
-          total: total.length,
-          page,
-          limit,
-          pageTotal,
-        },
+        data: formatedRoles || [],
       });
     } catch (error) {
       sails.log.error("Server Error: ", error);
