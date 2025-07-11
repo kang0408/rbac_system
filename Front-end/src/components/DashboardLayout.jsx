@@ -66,7 +66,7 @@ export function DashboardLayout({ children }) {
   ];
 
   const filteredNavigation = navigation.filter((item) =>
-    item.roles.includes(user.role)
+    item.roles.includes(user.roles[0].name)
   );
 
   return (
@@ -154,7 +154,9 @@ export function DashboardLayout({ children }) {
               </div>
               <div className="ml-3 flex-1">
                 <p className="text-sm font-medium text-gray-700">{user.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {user.roles[0].name}
+                </p>
               </div>
               <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
