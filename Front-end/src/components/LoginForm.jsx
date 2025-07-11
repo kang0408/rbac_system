@@ -105,9 +105,9 @@ export function LoginForm() {
           </div>
           <div className="text-sm text-gray-600">
             <p>Demo credentials:</p>
-            <p>Admin: admin@example.com / admin123</p>
-            <p>Manager: manager@example.com / manager123</p>
-            <p>User: user@example.com / user123</p>
+            <p>Admin: admin@cms.com / Abc@12345</p>
+            <p>Manager: manager@cms.com / Abc@12345</p>
+            <p>User: user@cms.com / Abc@12345</p>
           </div>
         </CardContent>
         <CardFooter>

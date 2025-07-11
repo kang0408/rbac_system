@@ -1,30 +1,36 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { DashboardLayout } from "../components/DashboardLayout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
-import { Switch } from "../components/ui/switch"
-import { Separator } from "../components/ui/separator"
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { DashboardLayout } from '../components/DashboardLayout';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Switch } from '../components/ui/switch';
+import { Separator } from '../components/ui/separator';
 
 export function SettingsPage() {
-  const [user, setUser] = useState(null)
-  const navigate = useNavigate()
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const currentUser = localStorage.getItem("currentUser")
+    const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
-      navigate("/")
-      return
+      navigate('/');
+      return;
     }
-    setUser(JSON.parse(currentUser))
-  }, [navigate])
+    setUser(JSON.parse(currentUser));
+  }, [navigate]);
 
   if (!user) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -32,14 +38,18 @@ export function SettingsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-gray-600">Manage your account and system preferences</p>
+          <p className="text-gray-600">
+            Manage your account and system preferences
+          </p>
         </div>
 
         <div className="grid gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Profile Settings</CardTitle>
-              <CardDescription>Update your personal information and preferences</CardDescription>
+              <CardDescription>
+                Update your personal information and preferences
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -54,13 +64,18 @@ export function SettingsPage() {
               </div>
               <div>
                 <Label htmlFor="current-role">Current Role</Label>
-                <Input id="current-role" value={user.role} disabled className="capitalize" />
+                <Input
+                  id="current-role"
+                  value={user.role}
+                  disabled
+                  className="capitalize"
+                />
               </div>
               <Button>Save Changes</Button>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Security Settings</CardTitle>
               <CardDescription>Manage your account security and authentication</CardDescription>
@@ -80,9 +95,9 @@ export function SettingsPage() {
               </div>
               <Button>Update Password</Button>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Notification Preferences</CardTitle>
               <CardDescription>Configure how you receive notifications</CardDescription>
@@ -112,9 +127,9 @@ export function SettingsPage() {
                 <Switch />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          {user.role === "admin" && (
+          {/* {user.role === "admin" && (
             <Card>
               <CardHeader>
                 <CardTitle>System Settings</CardTitle>
@@ -147,9 +162,9 @@ export function SettingsPage() {
                 <Button>Save System Settings</Button>
               </CardContent>
             </Card>
-          )}
+          )} */}
         </div>
       </div>
     </DashboardLayout>
-  )
+  );
 }
