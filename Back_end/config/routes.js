@@ -12,6 +12,7 @@ const PREFIX = "/api/v1";
 const USER_PREFIX = "/users";
 const ROLE_PREFIX = "/roles";
 const PERMISSION_PREFIX = "/permissions";
+const AUTH_PREFIX = "/auth";
 
 const routes = [
   // USER
@@ -91,6 +92,17 @@ const routes = [
     method: "DELETE",
     path: PREFIX + PERMISSION_PREFIX + "/delete/:id",
     action: "permission/delete-permission",
+  },
+  // AUTH
+  {
+    method: "POST",
+    path: PREFIX + AUTH_PREFIX + "/login",
+    action: "auth/login",
+  },
+  {
+    method: "GET",
+    path: PREFIX + AUTH_PREFIX + "/me",
+    action: "auth/me",
   },
 ];
 
