@@ -8,6 +8,12 @@
 module.exports = {
   tableName: "roles",
   attributes: {
+    id: {
+      type: "string",
+      required: true,
+      unique: true,
+      columnName: "_id",
+    },
     name: {
       type: "string",
       required: true,

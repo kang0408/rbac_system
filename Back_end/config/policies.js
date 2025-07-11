@@ -9,15 +9,15 @@
  */
 
 const isLoggin = require("../api/policies/isLoggin");
+const permission = require("../api/policies/permission");
 
 module.exports.policies = {
-  /***************************************************************************
-   *                                                                          *
-   * Default policy for all controllers and actions, unless overridden.       *
-   * (`true` allows public access)                                            *
-   *                                                                          *
-   ***************************************************************************/
-
-  // '*': true,
-  "auth/me": [isLoggin],
+  // AUTH
+  "auth/me": [isLoggin, permission],
+  // USER
+  "user/*": [isLoggin, permission],
+  // ROLE
+  "role/*": [isLoggin, permission],
+  // PERMISSION
+  "permission/*": [isLoggin, permission],
 };

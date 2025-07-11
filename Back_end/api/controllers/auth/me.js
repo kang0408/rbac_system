@@ -35,10 +35,40 @@ module.exports = {
 
       delete user.password;
 
+      const permisstionFormat = {};
+      if (user.roles) {
+        const role = await Role.findOne({ id: user.roles[0] });
+
+        if (role) {
+          const permissionDetails = await Permission.find({
+            id: { in: role.permissions },
+          });
+
+          permissionDetails.forEach((item) => {
+            if (!permisstionFormat[item.resource])
+              permisstionFormat[item.resource] = [
+                {
+                  id: item.id,
+                  action: item.action,
+                },
+              ];
+            else {
+              permisstionFormat[item.resource].push({
+                id: item.id,
+                action: item.action,
+              });
+            }
+          });
+        }
+      }
+
       return exits.success({
         status: 200,
         message: "Get profile successfully",
-        data: user,
+        data: {
+          user: user,
+          permission: permisstionFormat,
+        },
       });
     } catch (error) {
       sails.log.error("Server Error: ", error);
