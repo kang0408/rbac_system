@@ -1,0 +1,1265 @@
+openapi: 3.0.3
+info:
+  title: RBAC System API
+  description: Role-Based Access Control System API Documentation
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Base Response Schema
+    BaseResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Success"
+
+    # Error Response Schema
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Bad Request"
+
+    # User Schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRole"
+        status:
+          type: string
+          enum: [active, inactive, banned]
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRole:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Admin"
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - roles
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        roles:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011"]
+        status:
+          type: string
+          enum: [active, inactive, banned]
+          default: inactive
+          example: "active"
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        roles:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011"]
+        status:
+          type: string
+          enum: [active, inactive, banned]
+          example: "active"
+
+    # Role Schemas
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Admin"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateRoleRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Admin"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"]
+
+    UpdateRoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Admin"
+        permissions:
+          type: array
+          items:
+            type: string
+          example: ["507f1f77bcf86cd799439011", "507f1f77bcf86cd799439012"]
+
+    # Permission Schemas
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        resource:
+          type: string
+          example: "user"
+        action:
+          type: string
+          example: "read"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreatePermissionRequest:
+      type: object
+      required:
+        - resource
+      properties:
+        resource:
+          type: string
+          example: "user"
+        action:
+          type: string
+          example: "read"
+
+    UpdatePermissionRequest:
+      type: object
+      properties:
+        resource:
+          type: string
+          example: "user"
+        action:
+          type: string
+          example: "read"
+
+    # Auth Schemas
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "admin@example.com"
+        password:
+          type: string
+          format: password
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Login successfully"
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            refreshToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            user:
+              $ref: "#/components/schemas/User"
+
+    MeResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Get profile successfully"
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/User"
+            permission:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    action:
+                      type: string
+              example:
+                user:
+                  - id: "507f1f77bcf86cd799439011"
+                    action: "read"
+                  - id: "507f1f77bcf86cd799439012"
+                    action: "create"
+
+    # Statistics Schemas
+    StatisticsResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Get all roles successfully"
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "user"
+              title:
+                type: string
+                example: "Total Users"
+              value:
+                type: integer
+                example: 25
+              description:
+                type: string
+                example: "Active users in system"
+
+    # Pagination Schemas
+    PaginationQuery:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 1
+        limit:
+          type: integer
+          minimum: 1
+          default: 5
+          example: 10
+        search:
+          type: string
+          example: "john"
+        sortBy:
+          type: string
+          default: "updatedAt"
+          example: "email"
+        sortValue:
+          type: string
+          enum: [ASC, DESC]
+          default: "DESC"
+          example: "ASC"
+
+    PaginatedUsersResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: "Get all users successfully"
+        data:
+          type: object
+          properties:
+            users:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+            total:
+              type: integer
+              example: 25
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            pageTotal:
+              type: integer
+              example: 3
+
+paths:
+  # Authentication Endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT tokens
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user profile
+      description: Get authenticated user information and permissions
+      responses:
+        "200":
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # User Management Endpoints
+  /users:
+    get:
+      tags:
+        - User Management
+      summary: Get all users
+      description: Retrieve paginated list of users with search and sorting
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            default: 5
+        - name: search
+          in: query
+          description: Search by email
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            default: "updatedAt"
+        - name: sortValue
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [ASC, DESC]
+            default: "DESC"
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsersResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/create:
+    post:
+      tags:
+        - User Management
+      summary: Create new user
+      description: Create a new user with default password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "200":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/User"
+        "400":
+          description: Email already exists or validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/{id}:
+    get:
+      tags:
+        - User Management
+      summary: Get user details
+      description: Get detailed information about a specific user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/update/{id}:
+    patch:
+      tags:
+        - User Management
+      summary: Update user
+      description: Update user information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/User"
+        "400":
+          description: Email already exists or validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/delete/{id}:
+    delete:
+      tags:
+        - User Management
+      summary: Delete user
+      description: Delete a user from the system
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Role Management Endpoints
+  /roles:
+    get:
+      tags:
+        - Role Management
+      summary: Get all roles
+      description: Retrieve all roles in the system
+      responses:
+        "200":
+          description: Roles retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Role"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roles/create:
+    post:
+      tags:
+        - Role Management
+      summary: Create new role
+      description: Create a new role with permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleRequest"
+      responses:
+        "200":
+          description: Role created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Role"
+        "400":
+          description: Role creation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roles/{id}:
+    get:
+      tags:
+        - Role Management
+      summary: Get role details
+      description: Get detailed information about a specific role
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Role ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Role details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Role"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roles/update/{id}:
+    patch:
+      tags:
+        - Role Management
+      summary: Update role
+      description: Update role information and permissions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Role ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleRequest"
+      responses:
+        "200":
+          description: Role updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Role"
+        "400":
+          description: Role update failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roles/delete/{id}:
+    delete:
+      tags:
+        - Role Management
+      summary: Delete role
+      description: Delete a role from the system
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Role ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Role deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Permission Management Endpoints
+  /permissions:
+    get:
+      tags:
+        - Permission Management
+      summary: Get all permissions
+      description: Retrieve all permissions grouped by resource
+      responses:
+        "200":
+          description: Permissions retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              action:
+                                type: string
+                        example:
+                          user:
+                            - id: "507f1f77bcf86cd799439011"
+                              action: "read"
+                            - id: "507f1f77bcf86cd799439012"
+                              action: "create"
+                          role:
+                            - id: "507f1f77bcf86cd799439013"
+                              action: "read"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /permissions/create:
+    post:
+      tags:
+        - Permission Management
+      summary: Create new permission
+      description: Create a new permission for a resource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePermissionRequest"
+      responses:
+        "200":
+          description: Permission created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Permission"
+        "400":
+          description: Permission creation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /permissions/{id}:
+    get:
+      tags:
+        - Permission Management
+      summary: Get permission details
+      description: Get detailed information about a specific permission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Permission ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permission details retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Permission"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /permissions/update/{id}:
+    patch:
+      tags:
+        - Permission Management
+      summary: Update permission
+      description: Update permission resource and action
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Permission ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePermissionRequest"
+      responses:
+        "200":
+          description: Permission updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Permission"
+        "400":
+          description: Permission update failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /permissions/delete/{id}:
+    delete:
+      tags:
+        - Permission Management
+      summary: Delete permission
+      description: Delete a permission from the system
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Permission ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Permission deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Permission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # Statistics Endpoints
+  /statistics:
+    get:
+      tags:
+        - Statistics
+      summary: Get system statistics
+      description: Get total counts of users, roles, and permissions
+      responses:
+        "200":
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatisticsResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+tags:
+  - name: Authentication
+    description: Authentication related endpoints
+  - name: User Management
+    description: User CRUD operations
+  - name: Role Management
+    description: Role CRUD operations
+  - name: Permission Management
+    description: Permission CRUD operations
+  - name: Statistics
+    description: System statistics and analytics

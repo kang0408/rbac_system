@@ -9,22 +9,60 @@
  * https://sailsjs.com/config/bootstrap
  */
 
-module.exports.bootstrap = async function() {
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+const path = require("path");
 
-  // By convention, this is a good place to set up fake data during development.
-  //
-  // For example:
-  // ```
-  // // Set up fake development data (or if we already have some, avast)
-  // if (await User.count() > 0) {
-  //   return;
-  // }
-  //
-  // await User.createEach([
-  //   { emailAddress: 'ry@example.com', fullName: 'Ryan Dahl', },
-  //   { emailAddress: 'rachael@example.com', fullName: 'Rachael Shaw', },
-  //   // etc.
-  // ]);
-  // ```
+module.exports.bootstrap = async function (done) {
+  sails.after("hook:http:loaded", () => {
+    const swaggerPath = path.resolve(__dirname, "../docs/swagger.yaml");
+    const swaggerDocument = YAML.load(swaggerPath);
 
+    // Động hoá servers dựa trên environment
+    const currentPort = process.env.PORT || sails.config.port || 1337;
+    const productionUrl =
+      process.env.PRODUCTION_API_URL || process.env.SWAGGER_SERVER_URL;
+
+    swaggerDocument.servers = [
+      {
+        url: `http://localhost:${currentPort}/api/v1`,
+        description: "Development server",
+      },
+    ];
+
+    if (productionUrl) {
+      swaggerDocument.servers.push({
+        url: productionUrl,
+        description: "Production server",
+      });
+    }
+
+    if (process.env.NODE_ENV === "production" && productionUrl) {
+      swaggerDocument.servers = [
+        {
+          url: productionUrl,
+          description: "Production server",
+        },
+        {
+          url: `http://localhost:${currentPort}/api/v1`,
+          description: "Development server",
+        },
+      ];
+    }
+
+    sails.hooks.http.app.use(
+      "/docs",
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerDocument)
+    );
+
+    // Test route
+    sails.hooks.http.app.get("/test", (req, res) =>
+      res.send("Hello from bootstrap")
+    );
+
+    sails.log.info(" Swagger UI available at http://localhost:1337/docs");
+  });
+
+  return done();
 };
