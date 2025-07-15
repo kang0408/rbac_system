@@ -86,7 +86,10 @@ export function UserManagement({ currentUserRole }) {
 
   const handleEditUser = async (user) => {
     try {
-      const { data } = await api.patch(`/users/update/${editingUserId}`, user);
+      const { data } = await api.patch(`/users/update/${editingUserId}`, {
+        ...user,
+        roles: [user.role],
+      });
 
       if (data.status == 200) {
         getUserData();
