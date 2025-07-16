@@ -1,32 +1,45 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { RoleManagement } from '../components/RoleManagement';
+import api from '../config/axios.js';
 
 export function RolesPage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const getMe = async () => {
+    const { data } = await api.get('/auth/me');
+    return data.data.user;
+  };
+
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      navigate('/');
-      return;
-    }
+    const fetchUser = async () => {
+      const currentUser = await getMe();
 
-    const userData = JSON.parse(currentUser);
-    if (userData.roles[0].name !== 'admin') {
-      navigate('/dashboard');
-      return;
-    }
+      if (!currentUser) {
+        navigate('/');
+        return;
+      }
 
-    setUser(userData);
+      const userData = currentUser;
+      if (userData.roles[0].name !== 'admin') {
+        navigate('/dashboard');
+        return;
+      }
+
+      setUser(currentUser);
+    };
+
+    fetchUser();
   }, [navigate]);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (

@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/DashboardLayout';
@@ -30,13 +28,24 @@ export function DashboardPage() {
     }
   };
 
+  const getMe = async () => {
+    const { data } = await api.get('/auth/me');
+    return data.data.user;
+  };
+
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      navigate('/');
-      return;
-    }
-    setUser(JSON.parse(currentUser));
+    const fetchUser = async () => {
+      const currentUser = await getMe();
+
+      if (!currentUser) {
+        navigate('/');
+        return;
+      }
+
+      setUser(currentUser);
+    };
+
+    fetchUser();
   }, [navigate]);
 
   useEffect(() => {
@@ -44,7 +53,11 @@ export function DashboardPage() {
   }, []);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (

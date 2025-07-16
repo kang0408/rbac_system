@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
@@ -55,7 +53,6 @@ export function LoginForm() {
       });
 
       if (data) {
-        localStorage.setItem('currentUser', JSON.stringify(data.data.user));
         localStorage.setItem(
           'rbac_system_access_token',
           JSON.stringify(data.data.accessToken)

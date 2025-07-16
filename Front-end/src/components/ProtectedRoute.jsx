@@ -1,34 +1,40 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../config/axios';
 
 export function ProtectedRoute({ children, requiredRoles = [] }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const getMe = async () => {
+    const { data } = await api.get('/auth/me');
+    return data.data.user;
+  };
+
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
+    const fetchUser = async () => {
+      const currentUser = await getMe();
 
-    if (!currentUser) {
-      navigate('/');
-      return;
-    }
+      if (!currentUser) {
+        navigate('/');
+        return;
+      }
 
-    const userData = JSON.parse(currentUser);
+      if (
+        requiredRoles.length > 0 &&
+        !requiredRoles.includes(currentUser.roles[0].name)
+      ) {
+        navigate('/dashboard');
+        return;
+      }
 
-    if (
-      requiredRoles.length > 0 &&
-      !requiredRoles.includes(userData.roles[0].name)
-    ) {
-      navigate('/dashboard');
-      return;
-    }
+      setUser(currentUser);
+      setLoading(false);
+    };
 
-    setUser(userData);
-    setLoading(false);
-  }, [navigate, requiredRoles]);
+    fetchUser();
+  }, []);
 
   if (loading) {
     return (

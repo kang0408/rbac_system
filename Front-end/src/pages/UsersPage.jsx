@@ -1,35 +1,48 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { UserManagement } from '../components/UserManagement';
+import api from '../config/axios';
 
 export function UsersPage() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const getMe = async () => {
+    const { data } = await api.get('/auth/me');
+    return data.data.user;
+  };
+
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      navigate('/');
-      return;
-    }
+    const fetchUser = async () => {
+      const currentUser = await getMe();
 
-    const userData = JSON.parse(currentUser);
-    if (
-      userData.roles[0].name !== 'admin' &&
-      userData.roles[0].name !== 'manager'
-    ) {
-      navigate('/dashboard');
-      return;
-    }
+      if (!currentUser) {
+        navigate('/');
+        return;
+      }
 
-    setUser(userData);
+      const userData = currentUser;
+      if (
+        userData.roles[0].name !== 'admin' &&
+        userData.roles[0].name !== 'manager'
+      ) {
+        navigate('/dashboard');
+        return;
+      }
+
+      setUser(userData);
+    };
+
+    fetchUser();
   }, [navigate]);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
