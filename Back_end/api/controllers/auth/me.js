@@ -40,6 +40,12 @@ module.exports = {
         const role = await Role.findOne({ id: user.roles[0] });
 
         if (role) {
+          user.roles = [];
+          user.roles.push({
+            id: role.id,
+            name: role.name,
+          });
+
           const permissionDetails = await Permission.find({
             id: { in: role.permissions },
           });
